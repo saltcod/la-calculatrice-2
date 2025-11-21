@@ -81,9 +81,9 @@ export default function Component() {
   const initialLoan: LoanCalculator = {
     id: 1,
     type: 'loan',
-    loanAmount: 100000,
-    interestRate: 5,
-    loanTerm: 15,
+    loanAmount: 200000,
+    interestRate: 3.68,
+    loanTerm: 12,
     monthlyPayment: 0,
     totalPayment: 0,
   }
@@ -141,7 +141,7 @@ export default function Component() {
       currentAge,
       retirementAge: 56,
       currentBalance: 300000,
-      monthlyContribution: 500,
+      monthlyContribution: 2000,
       annualReturn: 6,
       totalContributions: 0,
       totalValue: 0,
@@ -163,7 +163,7 @@ export default function Component() {
           onClick={addInvestmentCalculator}
           className="border border-black px-4 py-2 bg-white hover:bg-black hover:text-white transition-colors uppercase text-xs font-bold"
         >
-          + RRSP Calculator
+          + RRSP
         </button>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
