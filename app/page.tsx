@@ -1,101 +1,151 @@
-import Image from "next/image";
+'use client'
 
-export default function Home() {
+import { useState } from 'react'
+
+interface Calculator {
+  id: number
+  loanAmount: number
+  interestRate: number
+  loanTerm: number
+  monthlyPayment: number
+  totalPayment: number
+}
+
+export default function Component() {
+  const [calculators, setCalculators] = useState<Calculator[]>([
+    {
+      id: 1,
+      loanAmount: 100000,
+      interestRate: 5,
+      loanTerm: 15,
+      monthlyPayment: 0,
+      totalPayment: 0,
+    },
+  ])
+
+  function calculateLoan(calculator: Calculator) {
+    const { loanAmount, interestRate, loanTerm } = calculator
+    const principal = loanAmount
+    const interest = interestRate / 100 / 12
+    const payments = loanTerm * 12
+
+    const x = Math.pow(1 + interest, payments)
+    const monthly = (principal * x * interest) / (x - 1)
+
+    if (isFinite(monthly)) {
+      return {
+        monthlyPayment: monthly,
+        totalPayment: monthly * payments,
+      }
+    } else {
+      return {
+        monthlyPayment: 0,
+        totalPayment: 0,
+      }
+    }
+  }
+
+  function updateCalculator(id: number, field: keyof Calculator, value: number) {
+    setCalculators((prev) =>
+      prev.map((calc) => {
+        if (calc.id === id) {
+          const updatedCalc = { ...calc, [field]: value }
+          const { monthlyPayment, totalPayment } = calculateLoan(updatedCalc)
+          return { ...updatedCalc, monthlyPayment, totalPayment }
+        }
+        return calc
+      })
+    )
+  }
+
+  function addCalculator(calculatorToDuplicate: Calculator) {
+    setCalculators((prev) => {
+      const newCalc = {
+        ...calculatorToDuplicate,
+        id: Date.now(),
+      }
+      const { monthlyPayment, totalPayment } = calculateLoan(newCalc)
+      return [...prev, { ...newCalc, monthlyPayment, totalPayment }]
+    })
+  }
+
+  function removeCalculator(id: number) {
+    setCalculators((prev) => prev.filter((calc) => calc.id !== id))
+  }
+
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
-
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+    <div className="p-8">
+      <h1 className="text-xl font-bold mb-8 uppercase tracking-tight">LA CALCULATRICE</h1>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {calculators.map((calculator) => (
+          <div key={calculator.id} className="border border-black p-4">
+            <div className="flex gap-2 mb-4">
+              <button
+                onClick={() => addCalculator(calculator)}
+                className="border border-black px-3 py-1 bg-white hover:bg-black hover:text-white transition-colors"
+              >
+                [+]
+              </button>
+              <button
+                onClick={() => removeCalculator(calculator.id)}
+                className="border border-black px-3 py-1 bg-white hover:bg-black hover:text-white transition-colors"
+              >
+                [-]
+              </button>
+            </div>
+            <div className="space-y-4">
+              <div>
+                <label className="block mb-2 uppercase text-xs font-bold">LOAN AMOUNT</label>
+                <input
+                  type="text"
+                  value={calculator.loanAmount.toLocaleString('en-US', { maximumFractionDigits: 0 })}
+                  onChange={(e) => {
+                    const value = e.target.value.replace(/,/g, '')
+                    if (!isNaN(Number(value))) {
+                      updateCalculator(calculator.id, 'loanAmount', Number(value))
+                    }
+                  }}
+                  className="w-full border border-black p-2 bg-white"
+                />
+              </div>
+              <div>
+                <label className="block mb-2 uppercase text-xs font-bold">INTEREST RATE %</label>
+                <input
+                  type="number"
+                  value={calculator.interestRate}
+                  onChange={(e) => updateCalculator(calculator.id, 'interestRate', Number(e.target.value))}
+                  min="0.1"
+                  max="20"
+                  step="0.1"
+                  className="w-full border border-black p-2 bg-white"
+                />
+              </div>
+              <div>
+                <label className="block mb-2 uppercase text-xs font-bold">LOAN TERM (YEARS)</label>
+                <input
+                  type="number"
+                  value={calculator.loanTerm}
+                  onChange={(e) => updateCalculator(calculator.id, 'loanTerm', Number(e.target.value))}
+                  min="1"
+                  max="30"
+                  className="w-full border border-black p-2 bg-white"
+                />
+              </div>
+              <div className="border-t border-black pt-3 space-y-1">
+                <div className="text-lg font-bold">
+                  ${calculator.monthlyPayment.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} / MONTH
+                </div>
+                <div className="text-sm">
+                  TOTAL: ${calculator.totalPayment.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                </div>
+                <div className="text-sm">
+                  INTEREST: ${(calculator.totalPayment - calculator.loanAmount).toLocaleString('en-US', { maximumFractionDigits: 0 })}
+                </div>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
-  );
+  )
 }
